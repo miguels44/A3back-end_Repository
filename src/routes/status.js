@@ -1,4 +1,4 @@
-import { database } from "../database.js";
+import { database } from "../../infra/database.js";
 
 export async function statusRoutes(app) {
   app.get("/", async (res, reply) => {

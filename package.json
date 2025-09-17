@@ -7,7 +7,10 @@
   "scripts": {
     "dev": "npm run services:up && node --watch src/server.js",
     "services:up": "docker compose -f infra/compose.yml up -d",
-    "services:down": "docker compose -f infra/compose.yml down"
+    "services:down": "docker compose -f infra/compose.yml down",
+    "migration:create": "npx knex migrate:make",
+    "migration:run": "npx knex migrate:up",
+    "migration:rollback": "npx knex migrate:rollback"
   },
   "keywords": [],
   "author": "",
