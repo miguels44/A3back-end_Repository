@@ -1,6 +1,7 @@
 import "dotenv/config";
 import fastify from "fastify";
 import { statusRoutes } from "./routes/status.js";
+import { env } from "./env/index.js";
 
 const app = fastify();
 
@@ -10,8 +11,8 @@ app.register(statusRoutes, {
 
 app
   .listen({
-    port: process.env.PORT,
+    port: env.PORT,
   })
   .then(() => {
-    console.log("HTTP Server in running in: " + process.env.PORT);
+    console.log("HTTP Server in running in: " + env.PORT);
   });
