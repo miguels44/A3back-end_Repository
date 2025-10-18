@@ -19,7 +19,7 @@ export async function subjectsRoutes(app) {
             const [subject] = await database("subjects")
                 .insert({ name })
                 .returning(["id", "name", "created_at", "updated_at"])
-            return reply.status(201).send(subject);
+            return reply.status(201).send(subject)
 
         } catch (error) {
             console.error(error)
@@ -70,6 +70,47 @@ export async function subjectsRoutes(app) {
                 return reply.status(400).send({ error: error.errors })
             }
             return reply.status(500).send({ error: "Erro ao buscar disciplina." })
+        }
+    })
+
+    app.put("/:id", { preHandler: [authenticate] }, async (req, reply) => {
+        try {
+            const paramsSchema = z.object({
+                id: z.string().uuid("ID de disciplina inválido."),
+            })
+
+            const bodySchema = z.object({
+                name: z.string().min(1, "O nome da disciplina não pode ser vazio.").optional(),
+            })
+
+            const { id } = paramsSchema.parse(req.params)
+            
+            const dataToUpdate = bodySchema.parse(req.body)
+
+            if (Object.keys(dataToUpdate).length === 0) {
+                return reply.status(400).send({ error: "Nenhum campo fornecido para atualização." })
+            }
+
+            const [updatedSubject] = await database("subjects")
+                .where({ id })
+                .update({ 
+                    ...dataToUpdate,
+                    updated_at: database.fn.now()
+                }, 
+                ["id", "name", "created_at", "updated_at"]
+            )
+
+            if (!updatedSubject) {
+                return reply.status(404).send({ error: "Disciplina não encontrada para atualização." })
+            }
+            return reply.status(200).send(updatedSubject)
+
+        } catch (error) {
+            console.error(error)
+            if (error instanceof z.ZodError) {
+                return reply.status(400).send({ error: error.errors })
+            }
+            return reply.status(500).send({ error: "Erro ao atualizar disciplina." })
         }
     })
 }
