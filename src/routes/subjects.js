@@ -19,7 +19,7 @@ export async function subjectsRoutes(app) {
             const [subject] = await database("subjects")
                 .insert({ name })
                 .returning(["id", "name", "created_at", "updated_at"])
-            return reply.status(201).send(subject)
+            return reply.status(201).send(subject);
 
         } catch (error) {
             console.error(error)
@@ -30,7 +30,7 @@ export async function subjectsRoutes(app) {
         }
     })
 
-    app.get("/", { preHandler: [authenticate] }, async (req, reply) => { 
+    app.get("/", { preHandler: [authenticate] }, async (req, reply) => {
         try {
             const subjects = await database("subjects").select(
                 "id",
@@ -38,7 +38,7 @@ export async function subjectsRoutes(app) {
                 "created_at",
                 "updated_at"
             )
-            return reply.status(200).send(subjects);
+            return reply.status(200).send(subjects)
 
         } catch (error) {
             console.error(error)
