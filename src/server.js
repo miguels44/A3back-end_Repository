@@ -15,9 +15,7 @@ app.register(statusRoutes, {
   prefix: "status",
 });
 
-app.register(userRoutes, {
-  prefix: "users",
-});
+app.register(userRoutes);
 
 app
   .listen({
