@@ -64,7 +64,9 @@ export async function userRoutes(app) {
         .first();
 
       if (!user) {
-        return reply.status(404).send({ error: "Usuário não encontrado." });
+        const errorMessage = { error: "Usuário não encontrado." };
+        console.log("Resposta de erro:", errorMessage); 
+        return reply.status(404).send(errorMessage);
       }
 
       return reply.status(200).send(user);
