@@ -4,6 +4,7 @@ import { statusRoutes } from "./routes/status.js";
 import { userRoutes } from "./routes/user.js";
 import { sessionRoutes } from "./routes/session.js";
 import { env } from "./env/index.js";
+import { subjectsRoutes } from "./routes/subjects.js";
 
 const app = fastify();
 
