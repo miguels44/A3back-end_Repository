@@ -84,7 +84,6 @@ export async function subjectsRoutes(app) {
             })
 
             const { id } = paramsSchema.parse(req.params)
-            
             const dataToUpdate = bodySchema.parse(req.body)
 
             if (Object.keys(dataToUpdate).length === 0) {
@@ -97,7 +96,7 @@ export async function subjectsRoutes(app) {
                     ...dataToUpdate,
                     updated_at: database.fn.now()
                 }, 
-                ["id", "name", "created_at", "updated_at"]
+                ["id", "name", "created_at", "updated_at"] 
             )
 
             if (!updatedSubject) {
@@ -111,6 +110,30 @@ export async function subjectsRoutes(app) {
                 return reply.status(400).send({ error: error.errors })
             }
             return reply.status(500).send({ error: "Erro ao atualizar disciplina." })
+        }
+    })
+   
+    app.delete("/:id", { preHandler: [authenticate] }, async (req, reply) => {
+        try {
+            const paramsSchema = z.object({
+                id: z.string().uuid("ID de disciplina inválido."),
+            })
+
+            const { id } = paramsSchema.parse(req.params);
+
+            const deletedCount = await database("subjects").where({ id }).del()
+
+            if (deletedCount === 0) {
+                return reply.status(404).send({ error: "Disciplina não encontrada para remoção." })
+            }
+            return reply.status(204).send()
+
+        } catch (error) {
+            console.error(error);
+            if (error instanceof z.ZodError) {
+                return reply.status(400).send({ error: error.errors })
+            }
+            return reply.status(500).send({ error: "Erro ao remover disciplina." })
         }
     })
 }
