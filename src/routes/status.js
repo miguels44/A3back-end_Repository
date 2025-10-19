@@ -1,10 +1,11 @@
 import { database } from "../../infra/database.js";
 
 export async function statusRoutes(app) {
-  app.get("/", async (res, reply) => {
+  app.get("/", async (req, reply) => {
     return reply.status(200).send({ status: "api is running!" });
   });
-  app.get("/database", async (res, reply) => {
+
+  app.get("/database", async (req, reply) => {
     try {
       await database.raw("SELECT 1");
       return reply.status(200).send({ status: "database is ok!" });
