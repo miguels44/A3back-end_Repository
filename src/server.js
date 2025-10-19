@@ -6,6 +6,7 @@ import { userRoutes } from "./routes/user.js";
 import { sessionRoutes } from "./routes/session.js";
 import { env } from "./env/index.js";
 import { subjectsRoutes } from "./routes/subjects.js";
+import { questionsRoutes } from "./routes/questions.js";
 
 const app = fastify();
 
@@ -16,6 +17,10 @@ app.register(sessionRoutes);
 app.register(statusRoutes);
 
 app.register(userRoutes);
+
+app.register(subjectsRoutes)
+
+app.register(questionsRoutes)
 
 app
   .listen({
