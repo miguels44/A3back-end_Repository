@@ -23,6 +23,14 @@ const listQuestionsQuerySchema = z.object({
     level: QuestionLevel.optional(),
 })
 
+const updateQuestionBodySchema = z.object({
+    statement: z.string().min(1, "O enunciado da questão não pode ser vazio.").optional(),
+    subject_id: z.string().uuid("O subject_id deve ser um UUID válido.").optional(),
+    type: QuestionType.optional(),
+    answer: z.string().min(1, "A resposta da questão não pode ser vazia.").optional(),
+    level: QuestionLevel.optional(),
+})
+
 export async function questionsRoutes(app) {
     app.post("/", { preHandler: [authenticate] }, async (req, reply) => {
         try {
@@ -142,7 +150,7 @@ export async function questionsRoutes(app) {
                     "subjects.name as subject_name"
                 )
                 .join("subjects", "questions.subject_id", "=", "subjects.id")
-                .where("questions.id", id) 
+                .where("questions.id", id)
                 .first()
 
             if (!question) {
@@ -162,7 +170,7 @@ export async function questionsRoutes(app) {
                     name: question.subject_name
                 }
             }
-            return reply.status(200).send(formattedQuestion);
+            return reply.status(200).send(formattedQuestion)
 
         } catch (error) {
             console.error("Erro ao buscar questão por ID:", error)
@@ -170,6 +178,55 @@ export async function questionsRoutes(app) {
                 return reply.status(400).send({ error: error.errors })
             }
             return reply.status(500).send({ error: "Erro ao buscar questão." })
+        }
+    })
+
+    app.put("/:id", { preHandler: [authenticate] }, async (req, reply) => {
+        try {
+            const paramsSchema = z.object({
+                id: z.string().uuid("ID de questão inválido."),
+            })
+            const { id } = paramsSchema.parse(req.params)
+
+            const dataToUpdate = updateQuestionBodySchema.parse(req.body)
+
+            if (Object.keys(dataToUpdate).length === 0) {
+                return reply.status(400).send({ error: "Nenhum campo fornecido para atualização." })
+            }
+
+            if (dataToUpdate.subject_id) {
+                const subject = await database("subjects").where({ id: dataToUpdate.subject_id }).first()
+                if (!subject) {
+                    return reply.status(400).send({
+                        error: "Disciplina Inválida.",
+                        message: `O novo subject_id ${dataToUpdate.subject_id} não corresponde a nenhuma disciplina existente.`,
+                    })
+                }
+            }
+
+            const [updated] = await database("questions")
+                .where({ id })
+                .update({ 
+                    ...dataToUpdate,
+                    updated_at: database.fn.now()
+                }, 
+                ["id", "statement", "subject_id", "type", "answer", "level", "created_at", "updated_at"]
+            )
+
+            if (!updated) {
+                return reply.status(404).send({ error: "Questão não encontrada para atualização." })
+            }
+            return reply.status(200).send(updated)
+
+        } catch (error) {
+            console.error("Erro ao atualizar questão:", error)
+            if (error instanceof z.ZodError) {
+                return reply.status(400).send({ 
+                    error: "Erro de Validação.",
+                    details: error.errors 
+                })
+            }
+            return reply.status(500).send({ error: "Erro ao atualizar questão." })
         }
     })
 }
