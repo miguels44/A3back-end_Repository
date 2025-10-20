@@ -229,4 +229,28 @@ export async function questionsRoutes(app) {
             return reply.status(500).send({ error: "Erro ao atualizar questão." })
         }
     })
+    
+    app.delete("/:id", { preHandler: [authenticate] }, async (req, reply) => {
+        try {
+            const paramsSchema = z.object({
+                id: z.string().uuid("ID de questão inválido."),
+            })
+
+            const { id } = paramsSchema.parse(req.params)
+
+            const deletedCount = await database("questions").where({ id }).del()
+
+            if (deletedCount === 0) {
+                return reply.status(404).send({ error: "Questão não encontrada para remoção." })
+            }
+            return reply.status(204).send();
+
+        } catch (error) {
+            console.error("Erro ao remover questão:", error)
+            if (error instanceof z.ZodError) {
+                return reply.status(400).send({ error: error.errors })
+            }
+            return reply.status(500).send({ error: "Erro ao remover questão." })
+        }
+    })
 }
