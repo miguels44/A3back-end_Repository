@@ -22,7 +22,7 @@ export async function authenticate(request, reply) {
 }
 
 export async function sessionRoutes(app) {
-  app.post("/sessions", async (req, reply) => {
+  app.post("/", async (req, reply) => {
     const bodySchema = z.object({
       email: z.string().email(),
       password: z.string(),
