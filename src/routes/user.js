@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { z } from "zod";
 
 export async function userRoutes(app) {
-  app.post("/users", async (req, reply) => {
+  app.post("/", async (req, reply) => {
     try {
       const bodySchema = z.object({
         name: z.string().min(1, "Nome é obrigatório."),
@@ -34,7 +34,7 @@ export async function userRoutes(app) {
     }
   });
 
-  app.get("/users", async (req, reply) => {
+  app.get("/", async (req, reply) => {
     try {
       const users = await database("users").select(
         "id",
@@ -50,7 +50,7 @@ export async function userRoutes(app) {
     }
   });
 
-  app.get("/users/:id", async (req, reply) => {
+  app.get("/:id", async (req, reply) => {
     try {
       const paramsSchema = z.object({
         id: z.string().uuid("ID inválido."),
@@ -79,7 +79,7 @@ export async function userRoutes(app) {
     }
   });
 
-  app.put("/users/:id", async (req, reply) => {
+  app.put("/:id", async (req, reply) => {
     try {
       const paramsSchema = z.object({
         id: z.string().uuid("ID inválido."),
@@ -121,7 +121,7 @@ export async function userRoutes(app) {
     }
   });
 
-  app.delete("/users/:id", async (req, reply) => {
+  app.delete("/:id", async (req, reply) => {
     try {
       const paramsSchema = z.object({
         id: z.string().uuid("ID inválido."),

@@ -7,20 +7,24 @@ import { sessionRoutes } from "./routes/session.js";
 import { env } from "./env/index.js";
 import { subjectsRoutes } from "./routes/subjects.js";
 import { questionsRoutes } from "./routes/questions.js";
+import { questionOptionsRoutes } from "./routes/questions-options.js"; 
+
 
 const app = fastify();
 
 app.register(cookie);
 
-app.register(sessionRoutes);
-
 app.register(statusRoutes);
 
-app.register(userRoutes);
+app.register(sessionRoutes, { prefix: "/sessions" });
 
-app.register(subjectsRoutes)
+app.register(userRoutes, { prefix: "/users" });
 
-app.register(questionsRoutes)
+app.register(subjectsRoutes, { prefix: "/subjects" });
+
+app.register(questionsRoutes, { prefix: "/questions" });
+
+app.register(questionOptionsRoutes, { prefix: "/questions" });
 
 app
   .listen({
